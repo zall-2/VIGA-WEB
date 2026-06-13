@@ -703,65 +703,6 @@ function generateSkyObjects() {
   document.getElementById('skyData').classList.remove('loading-iss');
 }
 
-function startBeritaAstronomi() {
-  const apiKey = 'DEMO_KEY';
-  const url = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}`;
-  const beritaDiv = document.getElementById('beritaData');
-
-  const fallbackData = [
-    {
-      title: "Pengumuman Kru Resmi Artemis III",
-      explanation: "NASA resmi mengumumkan empat astronot utama untuk misi pengujian orbit bumi Artemis III, yaitu Randy Bresnik, Luca Parmitano, Frank Rubio, dan Andre Douglas.",
-      date: "9 Juni 2026",
-      url: ""
-    },
-    {
-      title: "Misi ESA Mengungkap Misteri Halo Galaksi",
-      explanation: "Badan Antariksa Eropa (ESA) secara resmi berkomitmen pada misi antariksa baru untuk memetakan "halo" atau wilayah luar galaksi yang redup. Misi ini bertujuan menjawab bagaimana galaksi spiral seperti Bimasakti terbentuk.",
-      date: "12 Juni 2026",
-      url: ""
-    }
-  ];
-
-  fetch(url)
-  .then(res => {
-    if (!res.ok) throw new Error('NASA API error');
-    return res.json();
-  })
-  .then(data => {
-    if (data.media_type === 'image' && data.url) {
-      beritaDiv.innerHTML = `
-        <div class="berita-item">
-          <img src="${data.url}" alt="${data.title}" loading="lazy" onerror="this.style.display='none'">
-          <h3>${data.title}</h3>
-          <p>${data.explanation.substring(0, 300)}...</p>
-          <div class="berita-date">${data.date}</div>
-        </div>
-      `;
-    } else if (data.media_type === 'video') {
-      throw new Error('NASA hari ini upload video');
-    } else {
-      throw new Error('Data NASA kosong');
-    }
-    beritaDiv.classList.remove('loading-iss');
-  })
-  .catch(e => {
-    console.log('NASA API gagal, pake fallback:', e);
-    let html = '';
-    fallbackData.forEach(item => {
-      html += `
-        <div class="berita-item">
-          <img src="${item.url}" alt="${item.title}" loading="lazy" onerror="this.style.display='none'">
-          <h3>${item.title}</h3>
-          <p>${item.explanation}</p>
-          <div class="berita-date">${item.date}</div>
-        </div>
-      `;
-    });
-    beritaDiv.innerHTML = html;
-    beritaDiv.classList.remove('loading-iss');
-  });
-}
 
 function isValidInput(value, type) {
   value = value.trim();
@@ -784,7 +725,64 @@ function isValidInput(value, type) {
     default: return value.length >= 3;
   }
 }
+function startBeritaAstronomi() {
+  const apiKey = "DEMO_KEY"; 
+  const url = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}&count=3`;
+  const beritaDiv = document.getElementById("beritaData");
+  const loadingEl = document.getElementById("loading-berita");
 
+  const fallbackData = [
+    {
+      title: "Pengumuman Kru Resmi Artemis III",
+      explanation: "NASA resmi mengumumkan empat astronot utama untuk misi pengujian orbit bumi Artemis III, yaitu Randy Bresnik, Luca Parmitano, Frank Rubio, dan Andre Douglas.",
+      date: "9 Juni 2026",
+      url: ""
+    },
+    {
+      title: "Misi ESA Mengungkap Misteri Halo Galaksi",
+      explanation: "Badan Antariksa Eropa (ESA) secara resmi berkomitmen pada misi antariksa baru untuk memetakan "halo" atau wilayah luar galaksi yang redup. Misi ini bertujuan menjawab bagaimana galaksi spiral seperti Bimasakti terbentuk.",
+      date: "12 Juni 2026",
+      url: ""
+    }
+  ];
+
+  fetch(url)
+    .then(res => {
+      if (!res.ok) throw new Error("NASA API error");
+      return res.json();
+    })
+    .then(data => {
+      let html = "";
+      data.forEach(item => {
+        html += `
+          <div class="berita-item">
+            <h3>${item.title}</h3>
+            ${item.media_type === "image" ? `<img src="${item.url}" alt="${item.title}" style="max-width:100%; border-radius:8px;">` : ""}
+            <p>${item.explanation.substring(0, 200)}...</p>
+            <small>${item.date}</small>
+          </div>
+        `;
+      });
+      beritaDiv.innerHTML = html;
+      if (loadingEl) loadingEl.style.display = "none";
+    })
+    .catch(err => {
+      console.log("Gagal ambil berita NASA:", err);
+      
+      let html = "";
+      fallbackData.forEach(item => {
+        html += `
+          <div class="berita-item">
+            <h3>${item.title}</h3>
+            <p>${item.explanation}</p>
+            <small>${item.date}</small>
+          </div>
+        `;
+      });
+      beritaDiv.innerHTML = html;
+      if (loadingEl) loadingEl.style.display = "none";
+    });
+  }
 function getErrorMessage(type) {
   const messages = {
     nama: 'Nama minimal 3 huruf, jangan pakai angka doang!',

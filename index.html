@@ -513,12 +513,11 @@ input::placeholder { color: rgba(255, 255, 255, 0.5); }
     <button class="btn-nav" onclick="showSection('mainSection')">Kembali ke Menu</button>
   </div>
 </div>
-
+<div id="beritaData"></div>
+<div id="loading-berita" style="display: block;">Loading...</div>
 <div class="section" id="beritaSection">
   <h1>BERITA ASTRONOMI</h1>
-  <div class="berita-map">
-    <div id="beritaData" class="loading-iss">Mengambil berita terbaru dari NASA...</div>
-  </div>
+    </div>
   <div class="btn-group">
     <button class="btn-nav" onclick="showSection('mainSection')">Kembali ke Menu</button>
   </div>
@@ -737,7 +736,7 @@ function startBeritaAstronomi() {
     },
     {
       title: "Misi ESA Mengungkap Misteri Halo Galaksi",
-      explanation: "Badan Antariksa Eropa (ESA) secara resmi berkomitmen pada misi antariksa baru untuk memetakan "halo" atau wilayah luar galaksi yang redup. Misi ini bertujuan menjawab bagaimana galaksi spiral seperti Bimasakti terbentuk.",
+      explanation: "Badan Antariksa Eropa ESA secara resmi berkomitmen pada misi antariksa baru untuk memetakan "halo" atau wilayah luar galaksi yang redup. Misi ini bertujuan menjawab bagaimana galaksi spiral seperti Bimasakti terbentuk.",
       
       date: "12 Juni 2026"
     }

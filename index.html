@@ -746,8 +746,29 @@ function startBeritaAstronomi() {
     }
   ];
 
-  fetch(url)
+  // Fungsi buat nampilin fallback
+  const showFallback = () => {
+    let html = "";
+    fallbackData.forEach(item => {
+      html += `
+        <div class="berita-item">
+          <h3>${item.title}</h3>
+          <p>${item.explanation}</p>
+          <small>${item.date}</small>
+        </div>
+      `;
+    });
+    beritaDiv.innerHTML = html;
+    if (loadingEl) loadingEl.style.display = "none";
+  };
+
+  // Timeout 3 detik
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+  fetch(url, { signal: controller.signal })
     .then(res => {
+      clearTimeout(timeoutId);
       if (!res.ok) throw new Error("NASA API error");
       return res.json();
     })
@@ -767,22 +788,11 @@ function startBeritaAstronomi() {
       if (loadingEl) loadingEl.style.display = "none";
     })
     .catch(err => {
+      clearTimeout(timeoutId);
       console.log("Gagal ambil berita NASA:", err);
-      
-      let html = "";
-      fallbackData.forEach(item => {
-        html += `
-          <div class="berita-item">
-            <h3>${item.title}</h3>
-            <p>${item.explanation}</p>
-            <small>${item.date}</small>
-          </div>
-        `;
-      });
-      beritaDiv.innerHTML = html;
-      if (loadingEl) loadingEl.style.display = "none";
+      showFallback(); // langsung tampilin cadangan
     });
-  }
+    }
 function getErrorMessage(type) {
   const messages = {
     nama: 'Nama minimal 3 huruf, jangan pakai angka doang!',

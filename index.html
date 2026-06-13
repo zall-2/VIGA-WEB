@@ -597,30 +597,29 @@ function launchAndGo(targetSection) {
   }, 1200);
 }
 
-async function fetchISS() {
-  try {
-    const res = await fetch('http://api.open-notify.org/iss-now.json');
-    const data = await res.json();
-    const lat = parseFloat(data.iss_position.latitude).toFixed(4);
-    const lon = parseFloat(data.iss_position.longitude).toFixed(4);
-    const timestamp = new Date(data.timestamp * 1000).toLocaleTimeString('id-ID');
-    document.getElementById('issData').innerHTML = `
-      <div class="iss-coords">
-        📍 Latitude: <span>${lat}°</span><br>
-        📍 Longitude: <span>${lon}°</span>
-      </div>
-      <div class="iss-status">Last update: ${timestamp} WIB</div>
-    `;
-    document.getElementById('issData').classList.remove('loading-iss');
-  } catch (e) {
-    document.getElementById('issData').innerHTML = '<div class="loading-iss">Gagal ambil data ISS, coba lagi...</div>';
-  }
+const issUrl = "https://api.wheretheiss.at/v1/satellites/25544";
+
+function updateISS() {
+  fetch(issUrl)
+    .then(res => {
+      if (!res.ok) throw new Error("Network error");
+      return res.json();
+    })
+    .then(data => {
+      const lat = data.latitude;
+      const lon = data.longitude;
+      issMarker.setLatLng([lat, lon]);
+      document.querySelector('.error').style.display = 'none';
+    })
+    .catch(err => {
+      console.log("Gagal ambil data ISS:", err);
+      document.querySelector('.error').textContent = "Gagal ambil data ISS, coba refresh...";
+      document.querySelector('.error').style.display = 'block';
+    });
 }
 
-function startISSTracker() {
-  fetchISS();
-  issInterval = setInterval(fetchISS, 3000);
-}
+updateISS();
+setInterval(updateISS, 5000);
 
 function getMoonPhase() {
   const now = new Date();

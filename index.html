@@ -606,15 +606,27 @@ function updateISS() {
       return res.json();
     })
     .then(data => {
+      console.log("Data ISS:", data); // buat ngecek di console
       const lat = data.latitude;
       const lon = data.longitude;
-      issMarker.setLatLng([lat, lon]);
-      document.querySelector('.error').style.display = 'none';
+      
+      // cek dulu issMarker nya ada apa nggak
+      if (typeof issMarker !== 'undefined' && issMarker) {
+        issMarker.setLatLng([lat, lon]);
+      } else {
+        console.log("issMarker belum ada");
+      }
+      
+      const errEl = document.querySelector('.error');
+      if(errEl) errEl.style.display = 'none';
     })
     .catch(err => {
       console.log("Gagal ambil data ISS:", err);
-      document.querySelector('.error').textContent = "Gagal ambil data ISS, coba refresh...";
-      document.querySelector('.error').style.display = 'block';
+      const errEl = document.querySelector('.error');
+      if(errEl) {
+        errEl.textContent = "Gagal ambil data ISS, coba refresh...";
+        errEl.style.display = 'block';
+      }
     });
 }
 

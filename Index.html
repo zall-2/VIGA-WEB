@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VANGUARD INDONESIA GARDA AEROSPACE</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #000;
+  color: #fff;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 60px;
+}
+
+#aurora {
+  position: fixed;
+  top: 0; left: -50%;
+  width: 200%; height: 100%;
+  z-index: -3;
+  background:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(0, 255, 136, 0.1) 20%,
+      rgba(0, 212, 255, 0.12) 40%,
+      rgba(255, 0, 255, 0.08) 60%,
+      transparent 100%);
+  animation: auroraFlow 25s linear infinite;
+}
+@keyframes auroraFlow {
+ 0% { transform: translate3d(0, 0, 0) skewY(-2deg); }
+ 100% { transform: translate3d(-50%, 0, 0) skewY(2deg); }
+}
+
+#stars {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+}
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s infinite;
+  will-change: opacity, transform;
+}
+@keyframes twinkle {
+ 0%, 100% { opacity: 0.3; transform: scale(1); }
+ 50% { opacity: 1; transform: scale(1.3); }
+}
+
+.rocket-wrapper {
+  position: fixed;
+  bottom: 5vh;
+  right: 50%;
+  transform: translateX(50%);
+  width: 260px;
+  height: 520px;
+  opacity: 0.5;
+  z-index: -1;
+  filter: blur(0.5px);
+  animation: floatRocket 6s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+@keyframes floatRocket {
+ 0%, 100% { transform: translateX(50%) translateY(0); }
+ 50% { transform: translateX(50%) translateY(-25px); }
+}
+
+.rocket-wrapper.launch {
+  animation: launchAndReturn 7s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes launchAndReturn {
+ 0% { transform: translateX(50%) translateY(0) scale(1); opacity: 0.5; }
+ 35% { transform: translateX(50%) translateY(-160vh) scale(0.15); opacity: 0; }
+ 40% { transform: translateX(50%) translateY(-160vh) scale(0.15); opacity: 0; }
+ 45% { transform: translateX(50%) translateY(100vh) scale(0.3); opacity: 0; }
+ 50% { opacity: 0.3; }
+ 100% { transform: translateX(50%) translateY(0) scale(1); opacity: 0.5; }
+}
+
+.rocket-bg {
+  width: 100%;
+  height: 100%;
+}
+
+.rocket-flame {
+  opacity: 0;
+  transform-origin: 130px 500px;
+}
+.rocket-wrapper.launch .rocket-flame {
+  animation: flamePulse 0.08s infinite, flameLaunchMove 1.8s forwards;
+}
+@keyframes flamePulse {
+ 0%, 100% { transform: scaleY(1) scaleX(1); }
+ 50% { transform: scaleY(1.6) scaleX(0.7); }
+}
+@keyframes flameLaunchMove {
+ 0% { transform: scaleY(0); opacity: 0; }
+ 10% { transform: scaleY(1.2); opacity: 1; }
+ 38% { transform: scaleY(3) translateY(-160vh); opacity: 1; }
+ 42% { opacity: 0; }
+ 48% { opacity: 0; transform: scaleY(0) translateY(100vh); }
+ 55% { transform: scaleY(1) translateY(0); opacity: 1; }
+ 100% { transform: scaleY(0); opacity: 0; }
+}
+
+#loading {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s;
+}
+.comet {
+  width: 60px; height: 60px;
+  border: 4px solid transparent;
+  border-top: 4px solid #00d4ff;
+  border-right: 4px solid #ff00ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.section {
+  display: none;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in;
+  position: relative;
+  z-index: 1;
+}
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  background: linear-gradient(90deg, #00d4ff, #ff00ff, #00ffcc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.profile {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 15px;
+  padding: 25px;
+  margin: 30px 0;
+}
+
+.btn-group { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin: 30px 0; }
+button {
+  padding: 15px 30px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s;
+  font-weight: bold;
+}
+.btn-daftar { background: linear-gradient(135deg, #00d4ff, #0099cc); color: #000; }
+.btn-daftar:hover { transform: scale(1.05); }
+.btn-kartu { background: linear-gradient(135deg, #ff00ff, #cc00cc); color: #fff; }
+.btn-kartu:hover { transform: scale(1.05); }
+.btn-iss { background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; }
+.btn-iss:hover { transform: scale(1.05); }
+.btn-sky { background: linear-gradient(135deg, #ffaa00, #ff6600); color: #000; }
+.btn-sky:hover { transform: scale(1.05); }
+.btn-wa { background: linear-gradient(135deg, #25D366, #128C7E); color: #fff; }
+.btn-wa:hover { transform: scale(1.05); }
+.btn-nav { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
+.btn-nav:hover { background: rgba(255, 255, 255, 0.2); }
+.btn-logout { background: linear-gradient(135deg, #ff4444, #cc0000); color: #fff; }
+.btn-logout:hover { transform: scale(1.05); }
+
+.info-text { font-size: 0.9rem; opacity: 0.7; margin-top: 10px; }
+
+.form-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 15px;
+  padding: 30px;
+  margin-top: 30px;
+}
+.step-indicator { text-align: center; margin-bottom: 20px; opacity: 0.7; }
+.form-step { display: none; }
+.form-step.active { display: block; animation: fadeIn 0.4s; }
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.5);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+}
+input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+.kartu {
+  background: linear-gradient(135deg, #001a33, #330033);
+  border: 2px solid #00d4ff;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: left;
+  max-width: 500px;
+  margin: 30px auto;
+}
+.kartu h2 { text-align: center; margin-bottom: 20px; color: #00d4ff; }
+.kartu-item { margin: 15px 0; font-size: 1.1rem; }
+.kartu-item span { color: #ff00ff; font-weight: bold; }
+
+.iss-tracker {
+  background: rgba(0, 255, 136, 0.05);
+  border: 2px solid #00ff88;
+  border-radius: 20px;
+  padding: 30px;
+  margin: 30px auto;
+  max-width: 600px;
+}
+.iss-icon { font-size: 4rem; animation: floatISS 3s ease-in-out infinite; }
+@keyframes floatISS {
+ 0%, 100% { transform: translateY(0); }
+ 50% { transform: translateY(-10px); }
+}
+.iss-coords { font-size: 1.5rem; margin: 20px 0; font-family: 'Courier New', monospace; }
+.iss-coords span { color: #00ff88; font-weight: bold; }
+.iss-status { font-size: 1rem; opacity: 0.8; margin-top: 10px; }
+.loading-iss { font-size: 1.2rem; color: #00ff88; animation: pulse 1.5s infinite; }
+@keyframes pulse {
+ 0%, 100% { opacity: 0.5; }
+ 50% { opacity: 1; }
+}
+
+.sky-map {
+  background: rgba(255, 170, 0, 0.05);
+  border: 2px solid #ffaa00;
+  border-radius: 20px;
+  padding: 30px;
+  margin: 30px auto;
+  max-width: 700px;
+}
+.sky-location { font-size: 1.2rem; color: #ffaa00; margin-bottom: 20px; }
+.sky-compass { font-size: 0.9rem; color: #aaa; margin-bottom: 15px; letter-spacing: 10px; }
+.sky-object {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 170, 0, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+  margin: 10px 0;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.sky-icon { font-size: 2.5rem; min-width: 50px; }
+.sky-info h3 { color: #ffaa00; margin-bottom: 5px; font-size: 1.2rem; }
+.sky-info p { font-size: 0.9rem; opacity: 0.8; }
+.direction-badge {
+  background: #ffaa00;
+  color: #000;
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.berita-map {
+  background: rgba(0, 212, 255, 0.05);
+  border: 2px solid #00d4ff;
+  border-radius: 20px;
+  padding: 30px;
+  margin: 30px auto;
+  max-width: 700px;
+  text-align: left;
+}
+.berita-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+  transition: transform 0.3s;
+}
+.berita-item:hover {
+  transform: translateX(10px);
+  border-color: #00d4ff;
+}
+.berita-item img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+.berita-item h3 {
+  color: #00d4ff;
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+}
+.berita-item p {
+  font-size: 0.95rem;
+  opacity: 0.8;
+  line-height: 1.6;
+}
+.berita-date {
+  font-size: 0.8rem;
+  color: #ff00ff;
+  margin-top: 10px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border-top: 2px solid rgba(0, 212, 255, 0.5);
+  padding: 12px 20px;
+  text-align: center;
+}
+.footer-box {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(255, 0, 255, 0.2));
+  border: 1px solid rgba(0, 212, 255, 0.5);
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #00d4ff;
+  letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="comet"></div></div>
+<div id="aurora"></div>
+<div id="stars"></div>
+
+<div class="rocket-wrapper" id="rocketWrapper">
+  <svg class="rocket-bg" id="rocket" viewBox="0 0 260 520" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="rocketBody" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#d0d0d0"/>
+        <stop offset="50%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#a0a0a0"/>
+      </linearGradient>
+      <radialGradient id="realFlame">
+        <stop offset="0%" stop-color="#ffff99"/>
+        <stop offset="30%" stop-color="#ff8800"/>
+        <stop offset="70%" stop-color="#ff2200"/>
+        <stop offset="100%" stop-color="#880000"/>
+      </radialGradient>
+    </defs>
+
+    <circle cx="100" cy="495" r="8" fill="#222"/>
+    <circle cx="130" cy="495" r="10" fill="#111"/>
+    <circle cx="160" cy="495" r="8" fill="#222"/>
+    <circle cx="85" cy="485" r="7" fill="#333"/>
+    <circle cx="115" cy="485" r="7" fill="#333"/>
+    <circle cx="145" cy="485" r="7" fill="#333"/>
+    <circle cx="175" cy="485" r="7" fill="#333"/>
+
+    <rect x="105" y="70" width="50" height="410" fill="url(#rocketBody)" stroke="#888" stroke-width="1"/>
+    <rect x="105" y="150" width="50" height="20" fill="#111"/>
+    <rect x="105" y="300" width="50" height="15" fill="#111"/>
+    <polygon points="130,25 105,70 155,70" fill="#fff" stroke="#888" stroke-width="1"/>
+    <rect x="90" y="420" width="15" height="50" fill="#444" transform="rotate(-15 97 445)"/>
+    <rect x="155" y="420" width="15" height="50" fill="#444" transform="rotate(15 162 445)"/>
+    <circle cx="130" cy="200" r="12" fill="#ff00ff"/>
+    <text x="130" y="206" text-anchor="middle" fill="white" font-size="14" font-weight="bold">V</text>
+
+    <g class="rocket-flame">
+      <polygon points="125,500 130,540 135,500" fill="url(#realFlame)"/>
+      <polygon points="95,490 100,525 105,490" fill="url(#realFlame)"/>
+      <polygon points="155,490 160,525 165,490" fill="url(#realFlame)"/>
+      <ellipse cx="130" cy="520" rx="25" ry="18" fill="#ffaa00" opacity="0.95"/>
+    </g>
+  </svg>
+</div>
+
+<div class="section active" id="mainSection">
+  <h1>VANGUARD INDONESIA GARDA AEROSPACE</h1>
+  <div class="profile">
+    <p><strong>Komunitas Riset Roket Eksperimental</strong></p>
+    <p>Berbasis Daerah Batang, Jawa Tengah</p>
+    <p>Didirikan: 2026 | Fokus: GAN 1 Project</p>
+  </div>
+  <div class="btn-group">
+    <button class="btn-daftar" onclick="launchAndGo('formSection')">DAFTAR VIGA</button>
+  </div>
+  <p class="info-text">pendaftaran komunitas VANGUARD INDONESIA GARDA AEROSPACE</p>
+  <div class="btn-group">
+    <button class="btn-kartu" onclick="launchAndGo('kartuSection')">KARTU</button>
+  </div>
+  <p class="info-text">Kartu anggota VANGUARD INDONESIA GARDA AEROSPACE</p>
+  <div class="btn-group">
+    <button class="btn-iss" onclick="launchAndGo('issSection')">ISS TRACKER</button>
+  </div>
+  <p class="info-text">pelacak International Space Station real time</p>
+  <div class="btn-group">
+    <button class="btn-sky" onclick="launchAndGo('skySection')">PETA LANGIT</button>
+  </div>
+  <p class="info-text">peta langit yang bisa menunjukkan ada apa saja yang di langit daerah kita</p>
+  <div class="btn-group">
+    <button class="btn-nav" onclick="launchAndGo('beritaSection')">BERITA ASTRONOMI</button>
+  </div>
+  <p class="info-text">Berita astronomy terbaru dari NASA</p>
+  <div class="btn-group">
+    <button class="btn-wa" onclick="window.open('https://chat.whatsapp.com/J2nzhdxGzr7CKTQikvL67Y', '_blank')">GABUNG GRUB WA</button>
+  </div>
+  <p class="info-text">Gabung grub komunitas yang ada di WhatsApp</p>
+  <div class="btn-group">
+    <button class="btn-wa" onclick="window.open('https://whatsapp.com/channel/0029VbDbNg2IXnllotFdOv17', '_blank')">GABUNG SALURAN WA</button>
+  </div>
+  <p class="info-text">Gabung saluran VIGA yang ada di WhatsApp</p>
+</div>
+
+<div class="section" id="formSection">
+  <h1>Pendaftaran VIGA</h1>
+  <div class="form-box">
+    <div class="step-indicator" id="stepIndicator">Langkah 1 dari 8</div>
+    <div class="form-step active" data-step="1">
+      <h3>Nama Lengkap</h3>
+      <input type="text" id="nama" placeholder="Masukkan nama Anda">
+    </div>
+    <div class="form-step" data-step="2">
+      <h3>Alasan Masuk VIGA</h3>
+      <textarea id="alasan" placeholder="Ceritakan alasan Anda..." rows="3"></textarea>
+    </div>
+    <div class="form-step" data-step="3">
+      <h3>Umur</h3>
+      <input type="number" id="umur" placeholder="Masukkan umur">
+    </div>
+    <div class="form-step" data-step="4">
+      <h3>Asal Kota</h3>
+      <input type="text" id="kota" placeholder="Contoh: Batang">
+    </div>
+    <div class="form-step" data-step="5">
+      <h3>Agama</h3>
+      <input type="text" id="agama" placeholder="Masukkan agama">
+    </div>
+    <div class="form-step" data-step="6">
+      <h3>Suka Astronomy Karena Apa?</h3>
+      <textarea id="suka" placeholder="Ceritakan..." rows="3"></textarea>
+    </div>
+    <div class="form-step" data-step="7">
+      <h3>Punya Keahlian Apa?</h3>
+      <input type="text" id="keahlian" placeholder="Contoh: Programming, Desain, dll">
+    </div>
+    <div class="form-step" data-step="8">
+      <h3>Akun TikTok</h3>
+      <input type="text" id="tiktok" placeholder="@username">
+    </div>
+    <div class="btn-group">
+      <button class="btn-nav" onclick="backStep()">Kembali</button>
+      <button class="btn-nav" onclick="nextStep()" id="nextBtn">Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="kartuSection">
+  <h1>Kartu Member VIGA</h1>
+  <div id="kartuContainer"></div>
+  <div class="btn-group" id="kartuButtons" style="display:none;">
+    <button class="btn-kartu" onclick="downloadKartu()">Download Kartu</button>
+    <button class="btn-logout" onclick="logout()">LOGOUT</button>
+  </div>
+  <div class="btn-group">
+    <button class="btn-nav" onclick="showSection('mainSection')">Kembali ke Menu</button>
+  </div>
+</div>
+
+<div class="section" id="issSection">
+  <h1>ISS TRACKER</h1>
+  <div class="iss-tracker">
+    <div class="iss-icon">🛰️</div>
+    <h2>International Space Station</h2>
+    <div id="issData" class="loading-iss">Mengambil data posisi ISS...</div>
+    <div class="iss-status">Update otomatis setiap 3 detik</div>
+  </div>
+  <div class="btn-group">
+    <button class="btn-nav" onclick="showSection('mainSection')">Kembali ke Menu</button>
+  </div>
+</div>
+
+<div class="section" id="skySection">
+  <h1>PETA LANGIT</h1>
+  <div class="sky-map">
+    <div id="skyLocation" class="sky-location">Mendeteksi lokasi Anda...</div>
+    <div class="sky-compass">UTARA • TIMUR • SELATAN • BARAT</div>
+    <div id="skyData" class="loading-iss">Mengambil data langit real time...</div>
+  </div>
+  <div class="btn-group">
+    <button class="btn-nav" onclick="showSection('mainSection')">Kembali ke Menu</button>
+  </div>
+</div>
+
+<div class="section" id="beritaSection">
+  <h1>BERITA ASTRONOMI</h1>
+  <div class="berita-map">
+    <div id="beritaData" class="loading-iss">Mengambil berita terbaru dari NASA...</div>
+  </div>
+  <div class="btn-group">
+    <button class="btn-nav" onclick="showSection('mainSection')">Kembali ke Menu</button>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-box">by zall_education</div>
+</footer>
+
+<script>
+let audioContext;
+function playWhoosh() {
+  if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  oscillator.frequency.setValueAtTime(900, audioContext.currentTime);
+  oscillator.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 2);
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+  gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.1);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + 2);
+}
+
+const starsContainer = document.getElementById('stars');
+for (let i = 0; i < 150; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.style.left = Math.random() * 100 + '%';
+  star.style.top = Math.random() * 100 + '%';
+  const size = Math.random() * 2 + 1;
+  star.style.width = star.style.height = size + 'px';
+  star.style.animationDelay = Math.random() * 3 + 's';
+  starsContainer.appendChild(star);
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loading').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('loading').style.display = 'none';
+    }, 500);
+  }, 2000);
+});
+
+let issInterval;
+function showSection(sectionId) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(sectionId).classList.add('active');
+  window.scrollTo(0, 0);
+
+  if(sectionId === 'mainSection') clearInterval(issInterval);
+  if(sectionId === 'kartuSection') renderKartu();
+  if(sectionId === 'issSection') startISSTracker();
+  if(sectionId === 'skySection') startSkyMap();
+  if(sectionId === 'beritaSection') startBeritaAstronomi();
+}
+
+function launchAndGo(targetSection) {
+  const rocketWrapper = document.getElementById('rocketWrapper');
+  playWhoosh();
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
+  rocketWrapper.classList.remove('launch');
+  void rocketWrapper.offsetWidth;
+  rocketWrapper.classList.add('launch');
+
+  setTimeout(() => {
+    rocketWrapper.classList.remove('launch');
+  }, 7000);
+
+  setTimeout(() => {
+    showSection(targetSection);
+  }, 1200);
+}
+
+async function fetchISS() {
+  try {
+    const res = await fetch('http://api.open-notify.org/iss-now.json');
+    const data = await res.json();
+    const lat = parseFloat(data.iss_position.latitude).toFixed(4);
+    const lon = parseFloat(data.iss_position.longitude).toFixed(4);
+    const timestamp = new Date(data.timestamp * 1000).toLocaleTimeString('id-ID');
+    document.getElementById('issData').innerHTML = `
+      <div class="iss-coords">
+        📍 Latitude: <span>${lat}°</span><br>
+        📍 Longitude: <span>${lon}°</span>
+      </div>
+      <div class="iss-status">Last update: ${timestamp} WIB</div>
+    `;
+    document.getElementById('issData').classList.remove('loading-iss');
+  } catch (e) {
+    document.getElementById('issData').innerHTML = '<div class="loading-iss">Gagal ambil data ISS, coba lagi...</div>';
+  }
+}
+
+function startISSTracker() {
+  fetchISS();
+  issInterval = setInterval(fetchISS, 3000);
+}
+
+function getMoonPhase() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  let r = year % 100;
+  r %= 19;
+  if (r > 9) r -= 19;
+  r = ((r * 11) % 30) + month + day;
+  if (month < 3) r += 2;
+  r %= 30;
+  if (r < 0) r += 30;
+  if (r < 1.84566) return { name: 'Bulan Baru', icon: '🌑' };
+  if (r < 5.53699) return { name: 'Bulan Sabit Awal', icon: '🌒' };
+  if (r < 9.22831) return { name: 'Perempat Pertama', icon: '🌓' };
+  if (r < 12.91963) return { name: 'Bulan Cembung Awal', icon: '🌔' };
+  if (r < 16.61096) return { name: 'Purnama', icon: '🌕' };
+  if (r < 20.30228) return { name: 'Bulan Cembung Akhir', icon: '🌖' };
+  if (r < 23.99361) return { name: 'Perempat Akhir', icon: '🌗' };
+  if (r < 27.68493) return { name: 'Bulan Sabit Akhir', icon: '🌘' };
+  return { name: 'Bulan Baru', icon: '🌑' };
+}
+
+function startSkyMap() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(4);
+        const lon = pos.coords.longitude.toFixed(4);
+        document.getElementById('skyLocation').innerHTML = `📍 Lokasi Anda: ${lat}°, ${lon}°`;
+        generateSkyObjects();
+      },
+      (err) => {
+        document.getElementById('skyLocation').innerHTML = '📍 Lokasi tidak terdeteksi';
+        generateSkyObjects();
+      }
+    );
+  } else {
+    document.getElementById('skyLocation').innerHTML = '📍 GPS tidak didukung';
+    generateSkyObjects();
+  }
+}
+
+function generateSkyObjects() {
+  const now = new Date();
+  const hour = now.getHours();
+  const moon = getMoonPhase();
+  const objects = [
+    { icon: moon.icon, name: 'Bulan', desc: `Fase: ${moon.name}`, direction: hour < 12? 'TIMUR' : 'BARAT' },
+    { icon: '🪐', name: 'Jupiter', desc: 'Planet terbesar, magnitudo -2.5', direction: hour < 18? 'BARAT' : 'TIMUR' },
+    { icon: '⭐', name: 'Sirius', desc: 'Bintang paling terang di langit malam', direction: 'SELATAN' },
+    { icon: '✨', name: 'Rasi Orion', desc: 'Gugusan 3 bintang pemburu sejajar', direction: 'TIMUR' },
+    { icon: '🪐', name: 'Saturnus', desc: 'Planet bercincin, magnitudo +0.5', direction: 'UTARA' }
+  ];
+  let html = '';
+  objects.forEach(obj => {
+    html += `
+      <div class="sky-object">
+        <div class="sky-icon">${obj.icon}</div>
+        <div class="sky-info">
+          <h3>${obj.name} <span class="direction-badge">${obj.direction}</span></h3>
+          <p>${obj.desc}</p>
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById('skyData').innerHTML = html;
+  document.getElementById('skyData').classList.remove('loading-iss');
+}
+
+function startBeritaAstronomi() {
+  const apiKey = 'DEMO_KEY';
+  const url = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}`;
+  const beritaDiv = document.getElementById('beritaData');
+
+  const fallbackData = [
+    {
+      title: "James Webb Telescope - Galaksi SMACS 0723",
+      explanation: "JWST menangkap gambar galaksi paling tajam sejauh ini. Galaksi di foto ini jaraknya 13.1 miliar tahun cahaya dari Bumi, artinya kita melihat masa lalu alam semesta.",
+      date: "2025-10-05",
+      url: "https://apod.nasa.gov/apod/image/2410/SMACS0723_JWST_960.jpg"
+    },
+    {
+      title: "ISS Melintas di Langit Indonesia",
+      explanation: "Stasiun Luar Angkasa Internasional akan terlihat melintas malam ini mulai jam 19:00 WIB. Lihat ke arah barat daya, ISS akan tampak seperti bintang bergerak cepat selama 4 menit.",
+      date: "2025-10-06",
+      url: "https://apod.nasa.gov/apod/image/2409/ISS_Sunset_Scott_960.jpg"
+    }
+  ];
+
+  fetch(url)
+  .then(res => {
+    if (!res.ok) throw new Error('NASA API error');
+    return res.json();
+  })
+  .then(data => {
+    if (data.media_type === 'image' && data.url) {
+      beritaDiv.innerHTML = `
+        <div class="berita-item">
+          <img src="${data.url}" alt="${data.title}" loading="lazy" onerror="this.style.display='none'">
+          <h3>${data.title}</h3>
+          <p>${data.explanation.substring(0, 300)}...</p>
+          <div class="berita-date">${data.date}</div>
+        </div>
+      `;
+    } else if (data.media_type === 'video') {
+      throw new Error('NASA hari ini upload video');
+    } else {
+      throw new Error('Data NASA kosong');
+    }
+    beritaDiv.classList.remove('loading-iss');
+  })
+  .catch(e => {
+    console.log('NASA API gagal, pake fallback:', e);
+    let html = '';
+    fallbackData.forEach(item => {
+      html += `
+        <div class="berita-item">
+          <img src="${item.url}" alt="${item.title}" loading="lazy" onerror="this.style.display='none'">
+          <h3>${item.title}</h3>
+          <p>${item.explanation}</p>
+          <div class="berita-date">${item.date}</div>
+        </div>
+      `;
+    });
+    beritaDiv.innerHTML = html;
+    beritaDiv.classList.remove('loading-iss');
+  });
+}
+
+function isValidInput(value, type) {
+  value = value.trim();
+  const lowerValue = value.toLowerCase();
+  if (!value ||!/[a-z0-9]/i.test(value)) return false;
+  const banned = ['asdf', 'qwerty', 'zxcv', 'ngasal', 'asal', 'nggak tau', 'gak tau', 'ga tau', 'xxx', 'aaa', '...', 'anjir', 'wkwk', 'haha', 'he', 'test', 'tes', 'lorem', 'ipsum', 'abc', '123', '111', '000'];
+  if (banned.includes(lowerValue)) return false;
+  if (/^(.)\1{2,}$/.test(lowerValue)) return false;
+  if (/(012|123|234|345|456|567|678|789)/.test(lowerValue)) return false;
+  switch(type) {
+    case 'nama': return value.length >= 3 && /[a-z]/i.test(value) &&!/^\d+$/.test(value);
+    case 'alasan': case 'suka':
+      const words = value.split(/\s+/).filter(w => w.length > 1);
+      return value.length >= 10 && words.length >= 2;
+    case 'umur':
+      const num = parseInt(value);
+      return!isNaN(num) && num >= 10 && num <= 80;
+    case 'kota': case 'agama': case 'keahlian': return value.length >= 3 && /[a-z]/i.test(value);
+    case 'tiktok': return value.replace('@', '').length >= 3;
+    default: return value.length >= 3;
+  }
+}
+
+function getErrorMessage(type) {
+  const messages = {
+    nama: 'Nama minimal 3 huruf, jangan pakai angka doang!',
+    alasan: 'Alasan minimal 10 karakter dan 2 kata, jelasin yang bener bro!',
+    umur: 'Umur harus angka antara 10-80 tahun!',
+    kota: 'Isi nama kota minimal 3 huruf!',
+    agama: 'Isi agama minimal 3 huruf!',
+    suka: 'Jelasin minimal 10 karakter dan 2 kata kenapa suka astronomy!',
+    keahlian: 'Isi keahlian minimal 3 huruf!',
+    tiktok: 'Username tiktok minimal 3 karakter!'
+  };
+  return messages[type] || 'Jawaban terlalu singkat atau asal-asalan!';
+}
+
+let currentStep = 1;
+const totalSteps = 8;
+let tempUserData = {};
+
+function updateStep() {
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
+  document.getElementById('stepIndicator').textContent = `Langkah ${currentStep} dari ${totalSteps}`;
+  document.getElementById('nextBtn').textContent = currentStep === totalSteps? 'Selesai' : 'Lanjutkan';
+}
+
+function backStep() {
+  if (currentStep > 1) {
+    currentStep--;
+    updateStep();
+  } else {
+    showSection('mainSection');
+  }
+}
+
+function nextStep() {
+  const inputs = ['nama', 'alasan', 'umur', 'kota', 'agama', 'suka', 'keahlian', 'tiktok'];
+  const currentInput = document.getElementById(inputs[currentStep - 1]);
+  const value = currentInput.value;
+  if (!value.trim()) {
+    alert('Isi dulu bro, jangan dikosongin!');
+    return;
+  }
+  if (!isValidInput(value, inputs[currentStep - 1])) {
+    alert(getErrorMessage(inputs[currentStep - 1]));
+    currentInput.focus();
+    currentInput.select();
+    return;
+  }
+  tempUserData[inputs[currentStep - 1]] = value;
+  if (currentStep < totalSteps) {
+    currentStep++;
+    updateStep();
+  } else {
+    localStorage.setItem('vigaUser', JSON.stringify(tempUserData));
+    alert('Pendaftaran selesai! Data sudah tersimpan.');
+    currentStep = 1;
+    tempUserData = {};
+    showSection('mainSection');
+  }
+}
+
+function renderKartu() {
+  const container = document.getElementById('kartuContainer');
+  const buttons = document.getElementById('kartuButtons');
+  const savedData = JSON.parse(localStorage.getItem('vigaUser'));
+  if (!savedData ||!savedData.nama) {
+    container.innerHTML = '<p style="text-align:center; font-size:1.3rem; margin-top:40px;">Kamu belum daftar VIGA</p>';
+    buttons.style.display = 'none';
+    return;
+  }
+  container.innerHTML = `
+    <div class="kartu" id="memberCard">
+      <h2>VANGUARD INDONESIA GARDA AEROSPACE</h2>
+      <h3 style="text-align:center; margin-bottom:20px;">Member Card</h3>
+      <div class="kartu-item">🪪 <span>Nama:</span> ${savedData.nama}</div>
+      <div class="kartu-item">🙆 <span>Umur:</span> ${savedData.umur}</div>
+      <div class="kartu-item">📍 <span>Asal kota:</span> ${savedData.kota}</div>
+      <div class="kartu-item">🛐 <span>Agama:</span> ${savedData.agama}</div>
+      <div class="kartu-item">🖥️ <span>Akun tiktok:</span> ${savedData.tiktok}</div>
+      <div class="kartu-item">⚡ <span>Keahlian:</span> ${savedData.keahlian}</div>
+    </div>
+  `;
+  buttons.style.display = 'flex';
+}
+
+function logout() {
+  localStorage.removeItem('vigaUser');
+  document.getElementById('kartuContainer').innerHTML = '<p style="text-align:center; font-size:1.3rem; margin-top:40px;">Kamu belum daftar VIGA</p>';
+  document.getElementById('kartuButtons').style.display = 'none';
+}
+
+function downloadKartu() {
+  const card = document.getElementById('memberCard');
+  html2canvas(card).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'VIGA_Member_Card.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }).catch(() => {
+    alert('Screenshot aja bro, fitur download gagal 😅');
+  });
+}
+</script>
+
+</body>
+</html>
